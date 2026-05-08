@@ -110,24 +110,34 @@ jobs:
             build-cov
 
       - name: Checkout robot template (sibling clone)
+        id: template_co
         uses: actions/checkout@v4
         with:
           repository: ${{ github.repository_owner }}/frc-2027-robot-starter
           path: frc-2027-robot-starter-co
           fetch-depth: 1
+          # frc-2027-robot-starter is a private repo; the default
+          # GITHUB_TOKEN can't read sibling repos. CROSS_REPO_TOKEN is a
+          # fine-grained PAT with `Contents: Read` on the robot repo;
+          # set it as a repo secret. If absent, this step fails and the
+          # match orchestrator below is skipped.
+          token: ${{ secrets.CROSS_REPO_TOKEN }}
         continue-on-error: true
 
       - name: Place template as a sibling directory
-        if: hashFiles('frc-2027-robot-starter-co/build.gradle.kts') != ''
+        id: sibling
+        if: steps.template_co.outcome == 'success' && hashFiles('frc-2027-robot-starter-co/build.gradle.kts') != ''
         run: |
           # run-match-test.sh expects ../frc-2027-robot-starter relative to
           # this checkout. CI checks out into the workspace, so we move the
-          # template up one level.
+          # template up one level. hashFiles can't reach paths outside
+          # $GITHUB_WORKSPACE, so downstream steps gate on this step's
+          # outcome instead.
           mv frc-2027-robot-starter-co ../frc-2027-robot-starter
           ls ../frc-2027-robot-starter
 
       - name: Run deploy/reload/match-phase orchestrator
-        if: hashFiles('../frc-2027-robot-starter/build.gradle.kts') != ''
+        if: steps.sibling.outcome == 'success'
         run: ./dev-emulation/run-match-test.sh
 
       - name: Run dev-emulation integration test (gpio-sim + vcan)
