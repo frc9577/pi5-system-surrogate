@@ -85,23 +85,19 @@ jobs:
 
       - name: Build upstream WPILib (jars + JNI .so's) [verbose]
         run: |
+          set +e
           ./hal-port/build.sh --info \
             :ntcore:jar :wpiutil:jar \
             :ntcore:ntcoreJNISharedReleaseSharedLibrary \
             :wpiutil:wpiutilJNISharedReleaseSharedLibrary \
             :hal:halJNISharedReleaseSharedLibrary \
-            -Ponlylinuxsystemcore 2>&1 | tee /tmp/build.log | tail -300
-          echo "--- compiler invocations from --info ---"
-          grep -E "Executing.*compileTask|aarch64-bookworm|/usr/bin/cc|/usr/bin/c\+\+|/clang" /tmp/build.log | head -10
-          # exit nonzero if the build failed
-          if grep -q "BUILD FAILED" /tmp/build.log; then exit 1; fi
-        run: |
-          ./hal-port/build.sh \
-            :ntcore:jar :wpiutil:jar \
-            :ntcore:ntcoreJNISharedReleaseSharedLibrary \
-            :wpiutil:wpiutilJNISharedReleaseSharedLibrary \
-            :hal:halJNISharedReleaseSharedLibrary \
-            -Ponlylinuxsystemcore
+            -Ponlylinuxsystemcore > /tmp/build.log 2>&1
+          status=$?
+          # Show last 300 lines for context
+          tail -300 /tmp/build.log
+          echo "--- compiler invocations from --info (sample) ---"
+          grep -E "compileTask|aarch64-bookworm|/usr/bin/cc|/usr/bin/c\+\+|clang" /tmp/build.log | head -20
+          exit $status
 
       - name: Configure + build daemon
         working-directory: daemon
