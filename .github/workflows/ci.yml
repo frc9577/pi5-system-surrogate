@@ -116,12 +116,6 @@ jobs:
           repository: ${{ github.repository_owner }}/frc-2027-robot-starter
           path: frc-2027-robot-starter-co
           fetch-depth: 1
-          # frc-2027-robot-starter is a private repo; the default
-          # GITHUB_TOKEN can't read sibling repos. CROSS_REPO_TOKEN is a
-          # fine-grained PAT with `Contents: Read` on the robot repo;
-          # set it as a repo secret. If absent, this step fails and the
-          # match orchestrator below is skipped.
-          token: ${{ secrets.CROSS_REPO_TOKEN }}
         continue-on-error: true
 
       - name: Place template as a sibling directory
