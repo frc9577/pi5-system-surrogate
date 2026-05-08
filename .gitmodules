@@ -1,0 +1,4 @@
+[submodule "hal-port/upstream/allwpilib"]
+	path = hal-port/upstream/allwpilib
+	url = https://github.com/wpilibsuite/allwpilib.git
+	shallow = true

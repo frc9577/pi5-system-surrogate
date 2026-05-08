@@ -1,0 +1,111 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  merge_group:
+    branches: [main]
+
+# Cancel superseded runs on the same branch / PR.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Install GCC 16 + build tooling
+        run: |
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
+          sudo apt-get install -y \
+            g++-16 cmake ninja-build \
+            libgpiod-dev \
+            curl jq
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - name: Cache upstream WPILib gradle build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            hal-port/upstream/allwpilib/.gradle
+            hal-port/upstream/allwpilib/build
+            hal-port/upstream/allwpilib/*/build
+          key: wpilib-${{ runner.os }}-${{ hashFiles('hal-port/upstream/allwpilib/.git/HEAD') }}
+
+      - name: Build upstream WPILib (jars + JNI .so's)
+        working-directory: hal-port/upstream/allwpilib
+        run: |
+          ./gradlew \
+            :ntcore:jar :wpiutil:jar \
+            :ntcore:ntcoreJNISharedReleaseSharedLibrary \
+            :wpiutil:wpiutilJNISharedReleaseSharedLibrary \
+            :hal:halJNISharedReleaseSharedLibrary \
+            -Ponlylinuxsystemcore
+
+      - name: Configure + build daemon
+        working-directory: ds-surrogate
+        run: |
+          cmake -B build -G Ninja -DCMAKE_CXX_COMPILER=g++-16
+          ninja -C build
+
+      - name: Run unit tests
+        working-directory: ds-surrogate/build
+        run: ctest --output-on-failure
+
+      - name: Coverage build + report
+        working-directory: ds-surrogate
+        run: |
+          cmake -B build-cov -G Ninja \
+            -DCMAKE_CXX_COMPILER=g++-16 \
+            -DDS_SURROGATE_COVERAGE=ON
+          ninja -C build-cov ds_surrogate_tests
+          (cd build-cov && ctest)
+          python3 -m venv .venv
+          .venv/bin/pip install -q gcovr
+          .venv/bin/gcovr --gcov-executable gcov-16 \
+            --root . --filter 'src/' \
+            --exclude '.*null_gpio_backend\.hpp$' \
+            --exclude '.*libgpiod_backend\.cpp$' \
+            build-cov
+
+      - name: Checkout robot template (sibling clone)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/frc-2027-robot-starter
+          path: frc-2027-robot-starter-co
+          fetch-depth: 1
+        continue-on-error: true
+
+      - name: Place template as a sibling directory
+        if: hashFiles('frc-2027-robot-starter-co/build.gradle.kts') != ''
+        run: |
+          # run-match-test.sh expects ../frc-2027-robot-starter relative to
+          # this checkout. CI checks out into the workspace, so we move the
+          # template up one level.
+          mv frc-2027-robot-starter-co ../frc-2027-robot-starter
+          ls ../frc-2027-robot-starter
+
+      - name: Run deploy/reload/match-phase orchestrator
+        if: hashFiles('../frc-2027-robot-starter/build.gradle.kts') != ''
+        run: ./dev-emulation/run-match-test.sh
+
+      - name: Run dev-emulation integration test (gpio-sim + vcan)
+        run: sudo ./dev-emulation/run-integration-test.sh
+        # GitHub runners can load gpio-sim and vcan kernel modules; if a
+        # particular runner image regresses, mark this `continue-on-error`.

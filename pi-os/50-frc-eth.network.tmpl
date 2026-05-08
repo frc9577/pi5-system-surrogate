@@ -1,0 +1,26 @@
+# systemd-networkd config for the Pi's onboard Ethernet, configured with
+# FRC's standard team-number-derived static addressing:
+#
+#   robot controller  10.TE.AM.2     (this Pi)
+#   gateway / radio   10.TE.AM.1
+#   driver station    10.TE.AM.5
+#
+# This file is a TEMPLATE. Boot-time render: frc-network-render replaces
+# {{TEAM_HI}} and {{TEAM_LO}} from the integer in /boot/firmware/frc-team-number
+# and writes the rendered config to /run/systemd/network/50-frc-eth.network
+# before systemd-networkd starts. See pi-os/README.md.
+
+[Match]
+Name=eth0 end0
+
+[Network]
+Address=10.{{TEAM_HI}}.{{TEAM_LO}}.2/24
+Gateway=10.{{TEAM_HI}}.{{TEAM_LO}}.1
+DNS=10.{{TEAM_HI}}.{{TEAM_LO}}.1
+LLMNR=yes
+MulticastDNS=yes
+
+# Keep DHCP off — robot controllers always use the static FRC address.
+DHCP=no
+LinkLocalAddressing=no
+IPv6AcceptRA=no

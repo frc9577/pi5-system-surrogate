@@ -1,0 +1,12 @@
+# Bring the SystemCore-renamed CAN interface up at FRC's standard 1 Mbps
+# classic-CAN bitrate. CAN FD is intentionally NOT enabled here: the HAT
+# supports FD, but FRC vendor devices (Phoenix 6, REVLib) currently use
+# classic CAN, and the SystemCore HAL distinguishes can_s* (classic) from
+# can_d* (FD).
+
+[Match]
+Name=can_s0
+
+[CAN]
+BitRate=1M
+RestartSec=100ms

@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# Render systemd-networkd config and hostname from the FRC team number
+# stored in /boot/firmware/frc-team-number. Run once at boot, before
+# systemd-networkd, by frc-network.service.
+#
+# Convention (mirrors roboRIO):
+#   team N (1..9999) -> IP  10.TE.AM.2   (zero-padded TEAM into TE.AM)
+#                       host systemcore-N-frc
+#
+# Editing the team is one file change on the boot partition; reboot or
+# `systemctl restart frc-network.service && systemctl reload systemd-networkd`
+# applies it.
+
+set -euo pipefail
+
+TEAM_FILE=${TEAM_FILE:-/boot/firmware/frc-team-number}
+TMPL=${TMPL:-/etc/frc/50-frc-eth.network.tmpl}
+NET_OUT=${NET_OUT:-/run/systemd/network/50-frc-eth.network}
+
+write_dhcp_fallback() {
+  mkdir -p "$(dirname "$NET_OUT")"
+  cat > "$NET_OUT" <<'EOF'
+# DHCP fallback rendered by frc-network-render: no usable team number set.
+# Fix by writing a team number (1..9999) to /boot/firmware/frc-team-number
+# and rebooting (or `systemctl restart frc-network.service`).
+[Match]
+Name=eth0 end0
+
+[Network]
+DHCP=yes
+LLMNR=yes
+MulticastDNS=yes
+EOF
+}
+
+raw=""
+if [[ -f $TEAM_FILE ]]; then
+  raw=$(tr -d '[:space:]' < "$TEAM_FILE")
+fi
+
+if [[ -z $raw ]]; then
+  echo "frc-network-render: no team number in $TEAM_FILE; falling back to DHCP" >&2
+  write_dhcp_fallback
+  exit 0
+fi
+
+if ! [[ $raw =~ ^[0-9]{1,4}$ ]] || (( raw < 1 )); then
+  echo "frc-network-render: invalid team number '$raw' in $TEAM_FILE (expected 1..9999); falling back to DHCP" >&2
+  write_dhcp_fallback
+  exit 0
+fi
+
+team=$((10#$raw))
+padded=$(printf '%04d' "$team")
+team_hi=$((10#${padded:0:2}))
+team_lo=$((10#${padded:2:2}))
+
+mkdir -p "$(dirname "$NET_OUT")"
+sed -e "s/{{TEAM_HI}}/$team_hi/g" -e "s/{{TEAM_LO}}/$team_lo/g" "$TMPL" > "$NET_OUT"
+
+want_host="systemcore-${team}-frc"
+if [[ $(hostname) != "$want_host" ]]; then
+  echo "$want_host" > /etc/hostname
+  hostnamectl set-hostname "$want_host" 2>/dev/null || true
+fi
+
+echo "frc-network-render: team=$team ip=10.${team_hi}.${team_lo}.2 host=${want_host}"

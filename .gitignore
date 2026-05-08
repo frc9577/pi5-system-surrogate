@@ -1,0 +1,44 @@
+# Java / Gradle
+build/
+build-cov/
+.gradle/
+*.class
+bin/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# C++ / native
+*.o
+*.so
+*.a
+*.dylib
+cmake-build-*/
+
+# IDE
+.idea/
+*.iml
+.vscode/launch.json
+.vscode/tasks.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log
+*.swp
+*.swo
+
+# Daemon runtime artifacts
+ds-surrogate.json
+/tmp/ds-surrogate-*.log
+
+# .claude project memory (intentionally not committed; see CLAUDE.md)
+.claude/

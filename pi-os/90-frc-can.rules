@@ -1,0 +1,7 @@
+# Rename the kernel-default can0 to match the WPILib SystemCore HAL's
+# expected interface naming. CAN.cpp in hal/src/main/native/systemcore maps
+# bus index 0 (classic) to "can_s0", and bus index 0 (FD) to "can_d0".
+#
+# We register only one CAN bus on this Pi, classic-mode at 1 Mbps, so we
+# rename it to can_s0.
+SUBSYSTEM=="net", KERNEL=="can0", NAME="can_s0"

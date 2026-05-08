@@ -1,0 +1,30 @@
+[Unit]
+Description=SystemCore stand-in NT4 daemon
+Documentation=https://github.com/wpilibsuite/allwpilib
+After=network-online.target sys-subsystem-net-devices-can_s0.device
+Wants=network-online.target
+
+[Service]
+# Type=simple for now — Type=notify + sd_notify wiring is a follow-up
+# (libsystemd-dev not currently installed on the workstation). Watchdog
+# integration tracked in docs/daemon-design.md "Derisking" section.
+Type=simple
+ExecStart=/opt/ds-surrogate/bin/ds-surrogate
+Environment=LD_LIBRARY_PATH=/opt/ds-surrogate/lib
+Restart=on-failure
+RestartSec=2
+
+# Realtime scheduling for the periodic ControlData publisher. Priority 10
+# is well below the kernel RT threshold, well above SCHED_OTHER. Required
+# permission: CAP_SYS_NICE.
+CPUSchedulingPolicy=fifo
+CPUSchedulingPriority=10
+
+# mlockall(MCL_CURRENT | MCL_FUTURE) at startup needs MEMLOCK headroom.
+LimitMEMLOCK=infinity
+
+# robot.service should `After=ds-surrogate.service` so HAL_Initialize
+# doesn't time out waiting for ServerReady on cold boot.
+
+[Install]
+WantedBy=multi-user.target

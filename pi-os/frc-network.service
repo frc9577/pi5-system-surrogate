@@ -1,0 +1,15 @@
+[Unit]
+Description=Render FRC network config from /boot/firmware/frc-team-number
+DefaultDependencies=no
+After=systemd-tmpfiles-setup.service local-fs.target
+Before=systemd-networkd.service network-pre.target
+Wants=local-fs.target
+RequiresMountsFor=/boot/firmware
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/frc-network-render
+RemainAfterExit=yes
+
+[Install]
+WantedBy=systemd-networkd.service
