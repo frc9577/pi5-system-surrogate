@@ -52,6 +52,9 @@ jobs:
             hal-port/upstream/allwpilib/*/build
           key: wpilib-${{ runner.os }}-${{ steps.subsha.outputs.sha }}
 
+      - name: Install SystemCore cross-toolchain
+        run: ./hal-port/build.sh installSystemCoreToolchain -Ponlylinuxsystemcore
+
       - name: Build upstream WPILib (jars + JNI .so's)
         run: |
           ./hal-port/build.sh \
