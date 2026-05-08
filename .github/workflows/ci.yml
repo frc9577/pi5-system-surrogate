@@ -32,20 +32,24 @@ jobs:
             libgpiod-dev \
             curl jq
 
-      - name: Pin host c++ to g++-16 (block clang fallback)
+      - name: Hide clang from WPILib host build
         run: |
-          # The runner image ships clang and the WPILib nativeutils
-          # build picks it up for host-targeted tasks, which then chokes
-          # on GCC-only flags like -Werror=restrict. Force GCC 16.
+          # WPILib's NativeUtils invokes /usr/bin/clang++ directly for
+          # the platform-default (host) compile of *Base static libs,
+          # bypassing update-alternatives. The platform config emits
+          # GCC-only flags (-Werror=restrict, -gz=zlib), so clang fails.
+          # Local dev boxes typically have only gcc; mirror that on the
+          # runner by renaming the clang binaries so NativeUtils' host
+          # detection falls through to g++.
           sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-16 100
           sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-16 100
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-16 100
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-16 100
-          echo "--- diagnostics ---"
+          for b in /usr/bin/clang /usr/bin/clang++ /usr/bin/clang-18 /usr/bin/clang++-18; do
+            [ -e "$b" ] && sudo mv "$b" "$b.bak" || true
+          done
           which cc c++ gcc g++ clang clang++ 2>&1 || true
           c++ --version
-          # Dump systemcore toolchain to confirm it was downloaded
-          ls -la ~/.gradle/toolchains/first/2025/systemcore/ 2>&1 | head -10 || true
 
       - name: Set up JDK 25
         uses: actions/setup-java@v4
@@ -70,34 +74,14 @@ jobs:
       - name: Install SystemCore cross-toolchain
         run: ./hal-port/build.sh installSystemCoreToolchain -Ponlylinuxsystemcore
 
-      - name: Inspect installed systemcore toolchain
+      - name: Build upstream WPILib (jars + JNI .so's)
         run: |
-          set -x
-          TC=~/.gradle/toolchains/first/2025/systemcore
-          ls -la "$TC" || true
-          ls -la "$TC/bin" 2>/dev/null | head -40 || true
-          if [ -x "$TC/bin/aarch64-bookworm-linux-gnu-g++" ]; then
-            "$TC/bin/aarch64-bookworm-linux-gnu-g++" --version
-          fi
-          if [ -x "$TC/bin/aarch64-bookworm-linux-gnu-gcc" ]; then
-            "$TC/bin/aarch64-bookworm-linux-gnu-gcc" --version
-          fi
-
-      - name: Build upstream WPILib (jars + JNI .so's) [verbose]
-        run: |
-          set +e
-          ./hal-port/build.sh --info \
+          ./hal-port/build.sh \
             :ntcore:jar :wpiutil:jar \
             :ntcore:ntcoreJNISharedReleaseSharedLibrary \
             :wpiutil:wpiutilJNISharedReleaseSharedLibrary \
             :hal:halJNISharedReleaseSharedLibrary \
-            -Ponlylinuxsystemcore > /tmp/build.log 2>&1
-          status=$?
-          # Show last 300 lines for context
-          tail -300 /tmp/build.log
-          echo "--- compiler invocations from --info (sample) ---"
-          grep -E "compileTask|aarch64-bookworm|/usr/bin/cc|/usr/bin/c\+\+|clang" /tmp/build.log | head -20
-          exit $status
+            -Ponlylinuxsystemcore
 
       - name: Configure + build daemon
         working-directory: daemon
