@@ -32,6 +32,21 @@ jobs:
             libgpiod-dev \
             curl jq
 
+      - name: Pin host c++ to g++-16 (block clang fallback)
+        run: |
+          # The runner image ships clang and the WPILib nativeutils
+          # build picks it up for host-targeted tasks, which then chokes
+          # on GCC-only flags like -Werror=restrict. Force GCC 16.
+          sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-16 100
+          sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-16 100
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-16 100
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-16 100
+          echo "--- diagnostics ---"
+          which cc c++ gcc g++ clang clang++ 2>&1 || true
+          c++ --version
+          # Dump systemcore toolchain to confirm it was downloaded
+          ls -la ~/.gradle/toolchains/first/2025/systemcore/ 2>&1 | head -10 || true
+
       - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
