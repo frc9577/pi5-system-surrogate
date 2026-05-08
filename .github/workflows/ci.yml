@@ -70,7 +70,31 @@ jobs:
       - name: Install SystemCore cross-toolchain
         run: ./hal-port/build.sh installSystemCoreToolchain -Ponlylinuxsystemcore
 
-      - name: Build upstream WPILib (jars + JNI .so's)
+      - name: Inspect installed systemcore toolchain
+        run: |
+          set -x
+          TC=~/.gradle/toolchains/first/2025/systemcore
+          ls -la "$TC" || true
+          ls -la "$TC/bin" 2>/dev/null | head -40 || true
+          if [ -x "$TC/bin/aarch64-bookworm-linux-gnu-g++" ]; then
+            "$TC/bin/aarch64-bookworm-linux-gnu-g++" --version
+          fi
+          if [ -x "$TC/bin/aarch64-bookworm-linux-gnu-gcc" ]; then
+            "$TC/bin/aarch64-bookworm-linux-gnu-gcc" --version
+          fi
+
+      - name: Build upstream WPILib (jars + JNI .so's) [verbose]
+        run: |
+          ./hal-port/build.sh --info \
+            :ntcore:jar :wpiutil:jar \
+            :ntcore:ntcoreJNISharedReleaseSharedLibrary \
+            :wpiutil:wpiutilJNISharedReleaseSharedLibrary \
+            :hal:halJNISharedReleaseSharedLibrary \
+            -Ponlylinuxsystemcore 2>&1 | tee /tmp/build.log | tail -300
+          echo "--- compiler invocations from --info ---"
+          grep -E "Executing.*compileTask|aarch64-bookworm|/usr/bin/cc|/usr/bin/c\+\+|/clang" /tmp/build.log | head -10
+          # exit nonzero if the build failed
+          if grep -q "BUILD FAILED" /tmp/build.log; then exit 1; fi
         run: |
           ./hal-port/build.sh \
             :ntcore:jar :wpiutil:jar \
