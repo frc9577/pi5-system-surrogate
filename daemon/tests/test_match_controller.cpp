@@ -6,10 +6,10 @@
 
 #include <chrono>
 
-using dssurrogate::DaemonState;
-using dssurrogate::MatchController;
-using dssurrogate::MatchPhase;
-using dssurrogate::RobotMode;
+using surrogate::DaemonState;
+using surrogate::MatchController;
+using surrogate::MatchPhase;
+using surrogate::RobotMode;
 using namespace std::chrono_literals;
 
 namespace {

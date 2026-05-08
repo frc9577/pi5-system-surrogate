@@ -5,7 +5,7 @@
 // Single source of truth for the NT4 topic paths and type-strings the
 // daemon serves and consumes. Mirrors the contract in
 // docs/daemon-design.md and what the upstream HAL publishes/subscribes.
-namespace dssurrogate::topics {
+namespace surrogate::topics {
 
 // HAL → us  (we publish)
 inline constexpr std::string_view kServerReady = "/Netcomm/Control/ServerReady";
@@ -29,4 +29,4 @@ inline constexpr std::string_view kDiagBuildInfo = "/dev/diag/build_info";
 inline constexpr std::string_view kTypeProtoControlData =
     "proto:mrc.proto.ProtobufControlData";
 
-}  // namespace dssurrogate::topics
+}  // namespace surrogate::topics

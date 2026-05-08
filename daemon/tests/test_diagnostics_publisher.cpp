@@ -8,12 +8,12 @@
 #include <chrono>
 #include <thread>
 
-using dssurrogate::CadenceTracker;
-using dssurrogate::DiagnosticsPublisher;
+using surrogate::CadenceTracker;
+using surrogate::DiagnosticsPublisher;
 using namespace std::chrono_literals;
 
 TEST(Diagnostics, HeartbeatIncrementsMonotonically) {
-  dssurrogate::NtServer server{56830};
+  surrogate::NtServer server{56830};
   CadenceTracker cadence;
   DiagnosticsPublisher diag{server.instance(), cadence, "test-build"};
 
@@ -35,7 +35,7 @@ TEST(Diagnostics, HeartbeatIncrementsMonotonically) {
 }
 
 TEST(Diagnostics, CadenceP99ReflectsTrackerState) {
-  dssurrogate::NtServer server{56831};
+  surrogate::NtServer server{56831};
   CadenceTracker cadence;
   for (int i = 0; i < 200; ++i) cadence.record_interval_us(7000);
   DiagnosticsPublisher diag{server.instance(), cadence, "test"};
@@ -49,7 +49,7 @@ TEST(Diagnostics, CadenceP99ReflectsTrackerState) {
 }
 
 TEST(Diagnostics, BuildInfoPublishedAtConstruction) {
-  dssurrogate::NtServer server{56832};
+  surrogate::NtServer server{56832};
   CadenceTracker cadence;
   DiagnosticsPublisher diag{server.instance(), cadence,
                             "abc123 2026-05-08T12:00:00Z g++-16"};
@@ -61,7 +61,7 @@ TEST(Diagnostics, BuildInfoPublishedAtConstruction) {
 }
 
 TEST(Diagnostics, UptimeMonotonicallyIncreases) {
-  dssurrogate::NtServer server{56833};
+  surrogate::NtServer server{56833};
   CadenceTracker cadence;
   DiagnosticsPublisher diag{server.instance(), cadence, "t"};
 
@@ -78,7 +78,7 @@ TEST(Diagnostics, UptimeMonotonicallyIncreases) {
 }
 
 TEST(Diagnostics, RunLoopStartsAndStopsCleanly) {
-  dssurrogate::NtServer server{56834};
+  surrogate::NtServer server{56834};
   CadenceTracker cadence;
   for (int i = 0; i < 50; ++i) cadence.record_interval_us(5000);
 

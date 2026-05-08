@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace dssurrogate {
+namespace surrogate {
 
 // Rolling cadence tracker for the periodic ControlData publisher. Stores
 // the last N intervals (us) in a fixed-size ring; computes percentiles by
@@ -42,4 +42,4 @@ class CadenceTracker {
   std::size_t count_ = 0;
 };
 
-}  // namespace dssurrogate
+}  // namespace surrogate

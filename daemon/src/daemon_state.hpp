@@ -4,7 +4,7 @@
 
 #include <mutex>
 
-namespace dssurrogate {
+namespace surrogate {
 
 // Single-mutex shared state per the daemon's concurrency model. Every
 // bridge (DS, SmartIo, gamepad ingest, web UI) reads/writes through this;
@@ -40,4 +40,4 @@ class DaemonState {
   int32_t match_time_s_ = 0;
 };
 
-}  // namespace dssurrogate
+}  // namespace surrogate

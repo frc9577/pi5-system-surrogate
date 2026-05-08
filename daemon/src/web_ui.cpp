@@ -7,7 +7,7 @@
 #include <format>
 #include <print>
 
-namespace dssurrogate {
+namespace surrogate {
 
 namespace {
 
@@ -15,7 +15,7 @@ constexpr std::string_view kRootHtml = R"HTML(<!doctype html>
 <html>
 <head>
 <meta charset="utf-8">
-<title>ds-surrogate</title>
+<title>pi5-system-surrogate</title>
 <style>
 body { font-family: ui-monospace, monospace; background: #1a1a1a; color: #e0e0e0; padding: 2em; max-width: 720px; }
 h1 { color: #4caf50; }
@@ -31,7 +31,7 @@ hr { border: 0; border-top: 1px solid #333; margin: 2em 0; }
 </style>
 </head>
 <body>
-<h1>ds-surrogate</h1>
+<h1>pi5-system-surrogate</h1>
 <div id="content">loading...</div>
 <hr>
 <h2>Match</h2>
@@ -242,4 +242,4 @@ void WebUI::stop() {
   }
 }
 
-}  // namespace dssurrogate
+}  // namespace surrogate

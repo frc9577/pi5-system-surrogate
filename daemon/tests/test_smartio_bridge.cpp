@@ -10,9 +10,9 @@
 #include <thread>
 #include <vector>
 
-using dssurrogate::ChannelMode;
-using dssurrogate::IGpioBackend;
-using dssurrogate::SmartIoBridge;
+using surrogate::ChannelMode;
+using surrogate::IGpioBackend;
+using surrogate::SmartIoBridge;
 using namespace std::chrono_literals;
 
 namespace {
@@ -43,7 +43,7 @@ constexpr std::array<SmartIoBridge::PinMapping, 2> kTestMap{{
 }  // namespace
 
 TEST(SmartIoBridge, ConstructionWithoutDispatchTouchesNothing) {
-  dssurrogate::NtServer server{56811};
+  surrogate::NtServer server{56811};
   RecBackend backend;
   SmartIoBridge bridge{server.instance(), backend, kTestMap};
   EXPECT_EQ(bridge.channel_count(), 2u);
@@ -52,7 +52,7 @@ TEST(SmartIoBridge, ConstructionWithoutDispatchTouchesNothing) {
 }
 
 TEST(SmartIoBridge, TypePublishedRoutesToBackend) {
-  dssurrogate::NtServer server{56812};
+  surrogate::NtServer server{56812};
   RecBackend backend;
   SmartIoBridge bridge{server.instance(), backend, kTestMap};
 
@@ -69,7 +69,7 @@ TEST(SmartIoBridge, TypePublishedRoutesToBackend) {
 }
 
 TEST(SmartIoBridge, ValsetWhileOutputDrivesBackend) {
-  dssurrogate::NtServer server{56813};
+  surrogate::NtServer server{56813};
   RecBackend backend;
   SmartIoBridge bridge{server.instance(), backend, kTestMap};
 
@@ -92,7 +92,7 @@ TEST(SmartIoBridge, ValsetWhileOutputDrivesBackend) {
 }
 
 TEST(SmartIoBridge, InputPublishesValget) {
-  dssurrogate::NtServer server{56814};
+  surrogate::NtServer server{56814};
   RecBackend backend;
   backend.input_value = true;
   SmartIoBridge bridge{server.instance(), backend, kTestMap};
@@ -111,7 +111,7 @@ TEST(SmartIoBridge, InputPublishesValget) {
 }
 
 TEST(SmartIoBridge, RunningThreadProcessesUpdates) {
-  dssurrogate::NtServer server{56815};
+  surrogate::NtServer server{56815};
   RecBackend backend;
   SmartIoBridge bridge{server.instance(), backend, kTestMap};
   bridge.start();

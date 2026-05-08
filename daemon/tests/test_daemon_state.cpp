@@ -6,8 +6,8 @@
 #include <thread>
 #include <vector>
 
-using dssurrogate::DaemonState;
-using dssurrogate::RobotMode;
+using surrogate::DaemonState;
+using surrogate::RobotMode;
 
 TEST(DaemonState, DefaultsAreSafe) {
   DaemonState s;

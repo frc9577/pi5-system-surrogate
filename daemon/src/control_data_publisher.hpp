@@ -9,7 +9,7 @@
 #include <span>
 #include <thread>
 
-namespace dssurrogate {
+namespace surrogate {
 
 // Periodic publisher of /Netcomm/Control/ControlData. Owns its own jthread.
 //
@@ -44,4 +44,4 @@ class ControlDataPublisher {
   std::jthread thread_;
 };
 
-}  // namespace dssurrogate
+}  // namespace surrogate

@@ -1,4 +1,4 @@
-# ds-surrogate
+# pi5-system-surrogate
 
 A development analog of the FRC 2027 SystemCore control system, built on a
 Raspberry Pi 5 + Waveshare 2-Channel CAN FD HAT, using the upstream
@@ -14,7 +14,7 @@ contract-validation client. Robot code lives in a sister repo,
 ## Layout
 
 ```
-ds-surrogate/      C++26 daemon — NT4 server on localhost:6810
+daemon/            C++26 daemon — NT4 server on localhost:6810
 pi-os/             udev + systemd-networkd + FMS networking config
 hal-port/          build wrapper for upstream allwpilib (submodule)
 dev-emulation/     gpio-sim + vcan harness; integration test orchestrators
@@ -27,18 +27,17 @@ docs/              architecture, design, derisking notes
 Two commands, in order, from the repo root after a fresh clone:
 
 ```bash
-git clone --recurse-submodules <this-repo-url> && cd ds-surrogate
+git clone --recurse-submodules <this-repo-url> && cd pi5-system-surrogate
 
 # 1) Build upstream WPILib (Java jars + JNI .so's the daemon links against)
-(cd hal-port/upstream/allwpilib && \
- ./gradlew :ntcore:jar :wpiutil:jar \
-           :ntcore:ntcoreJNISharedReleaseSharedLibrary \
-           :wpiutil:wpiutilJNISharedReleaseSharedLibrary \
-           :hal:halJNISharedReleaseSharedLibrary \
-           -Ponlylinuxsystemcore)
+./hal-port/build.sh :ntcore:jar :wpiutil:jar \
+                    :ntcore:ntcoreJNISharedReleaseSharedLibrary \
+                    :wpiutil:wpiutilJNISharedReleaseSharedLibrary \
+                    :hal:halJNISharedReleaseSharedLibrary \
+                    -Ponlylinuxsystemcore
 
 # 2) Build the daemon
-(cd ds-surrogate && cmake -B build -G Ninja -DCMAKE_CXX_COMPILER=g++-16 && \
+(cd daemon && cmake -B build -G Ninja -DCMAKE_CXX_COMPILER=g++-16 && \
  ninja -C build && (cd build && ctest))
 ```
 
@@ -49,11 +48,11 @@ of GoogleTest + cpp-httplib on first configure.
 ## Run
 
 ```bash
-./ds-surrogate/build/ds-surrogate
+./daemon/build/pi5-system-surrogate
 # NT4 :6810  +  Web UI :8080
 ```
 
-`./ds-surrogate/build/check_server_ready` confirms the daemon serves the
+`./daemon/build/check_server_ready` confirms the daemon serves the
 `HAL_Initialize` contract: `ServerReady=true` + `ControlData` with
 `DsConnected=true`.
 
@@ -65,7 +64,7 @@ a sibling directory:
 ```bash
 cd ..
 git clone <robot-template-url> frc-2027-robot-starter
-cd ds-surrogate
+cd pi5-system-surrogate
 ./dev-emulation/run-match-test.sh
 ```
 

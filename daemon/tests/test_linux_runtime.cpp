@@ -4,8 +4,8 @@
 
 #include <cstdlib>
 
-using namespace dssurrogate::linux_runtime;
-using dssurrogate::linux_runtime::NotifyKind;
+using namespace surrogate::linux_runtime;
+using surrogate::linux_runtime::NotifyKind;
 
 TEST(LinuxRuntime, NotifyWithoutNotifySocketIsSilent) {
   ::unsetenv("NOTIFY_SOCKET");

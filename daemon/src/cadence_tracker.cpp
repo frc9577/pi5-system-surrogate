@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-namespace dssurrogate {
+namespace surrogate {
 
 void CadenceTracker::record_interval_us(int64_t us) noexcept {
   samples_us_[next_] = us;
@@ -41,4 +41,4 @@ double CadenceTracker::max_ms() const noexcept {
   return static_cast<double>(sorted_cache_[count_ - 1]) / 1000.0;
 }
 
-}  // namespace dssurrogate
+}  // namespace surrogate

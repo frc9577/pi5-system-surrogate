@@ -1,15 +1,15 @@
 cmake_minimum_required(VERSION 3.28)
-project(ds-surrogate CXX)
+project(pi5-system-surrogate CXX)
 
-option(DS_SURROGATE_TESTS "Build tests" ON)
-option(DS_SURROGATE_COVERAGE "Enable coverage instrumentation" OFF)
+option(DAEMON_TESTS "Build tests" ON)
+option(DAEMON_COVERAGE "Enable coverage instrumentation" OFF)
 
 # CMake 3.28 doesn't yet have a feature map for GCC 16, so we set -std=c++26
 # directly rather than via CMAKE_CXX_STANDARD/cxx_std_26.
 add_compile_options(-std=c++26 -Wall -Wextra -Wpedantic)
 
-if(DS_SURROGATE_COVERAGE)
-  message(STATUS "ds-surrogate: coverage instrumentation enabled")
+if(DAEMON_COVERAGE)
+  message(STATUS "pi5-system-surrogate: coverage instrumentation enabled")
   add_compile_options(--coverage -O0 -g)
   add_link_options(--coverage)
 endif()
@@ -33,7 +33,7 @@ endif()
 
 # Static core library: every testable unit lives here. Daemon executable is
 # pure glue; tests link against this directly.
-add_library(ds_surrogate_core STATIC
+add_library(daemon_core STATIC
   src/nt_server.cpp
   src/daemon_state.cpp
   src/control_data_encoder.cpp
@@ -54,12 +54,12 @@ add_library(ds_surrogate_core STATIC
   ${NANOPB_DIR}/src/pb_decode.cpp
   ${NANOPB_DIR}/src/pb_encode.cpp
 )
-target_include_directories(ds_surrogate_core PUBLIC
+target_include_directories(daemon_core PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${WPILibNative_INCLUDE_DIRS}
   ${MRC_GEN_DIR}
 )
-target_link_libraries(ds_surrogate_core PUBLIC
+target_link_libraries(daemon_core PUBLIC
   WPILibNative::ntcore
   WPILibNative::wpinet
   WPILibNative::wpiutil
@@ -69,26 +69,26 @@ target_link_libraries(ds_surrogate_core PUBLIC
 )
 # DT_RPATH (transitive) so libntcore's deps resolve through the executable's
 # rpath instead of its own $ORIGIN.
-target_link_options(ds_surrogate_core PUBLIC LINKER:--disable-new-dtags)
+target_link_options(daemon_core PUBLIC LINKER:--disable-new-dtags)
 
-function(ds_surrogate_apply_rpath tgt)
+function(daemon_apply_rpath tgt)
   set_target_properties(${tgt} PROPERTIES
     BUILD_RPATH "${WPILibNative_LIBRARY_DIRS}"
     INSTALL_RPATH "$ORIGIN/../lib"
   )
 endfunction()
 
-add_executable(ds-surrogate src/main.cpp)
-target_link_libraries(ds-surrogate PRIVATE ds_surrogate_core)
-ds_surrogate_apply_rpath(ds-surrogate)
+add_executable(pi5-system-surrogate src/main.cpp)
+target_link_libraries(pi5-system-surrogate PRIVATE daemon_core)
+daemon_apply_rpath(pi5-system-surrogate)
 
 add_executable(check_server_ready src/check_server_ready.cpp)
-target_link_libraries(check_server_ready PRIVATE ds_surrogate_core)
-ds_surrogate_apply_rpath(check_server_ready)
+target_link_libraries(check_server_ready PRIVATE daemon_core)
+daemon_apply_rpath(check_server_ready)
 
 add_executable(nt_smartio_test src/nt_smartio_test.cpp)
-target_link_libraries(nt_smartio_test PRIVATE ds_surrogate_core)
-ds_surrogate_apply_rpath(nt_smartio_test)
+target_link_libraries(nt_smartio_test PRIVATE daemon_core)
+daemon_apply_rpath(nt_smartio_test)
 
 include(FetchContent)
 FetchContent_Declare(cpp_httplib
@@ -96,9 +96,9 @@ FetchContent_Declare(cpp_httplib
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 FetchContent_MakeAvailable(cpp_httplib)
-target_include_directories(ds_surrogate_core PUBLIC ${cpp_httplib_SOURCE_DIR})
+target_include_directories(daemon_core PUBLIC ${cpp_httplib_SOURCE_DIR})
 
-if(DS_SURROGATE_TESTS)
+if(DAEMON_TESTS)
   FetchContent_Declare(googletest
     URL https://github.com/google/googletest/archive/refs/tags/v1.15.2.tar.gz
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE

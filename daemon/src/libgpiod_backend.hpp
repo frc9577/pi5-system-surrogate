@@ -11,7 +11,7 @@ class chip;
 class line;
 }
 
-namespace dssurrogate {
+namespace surrogate {
 
 // libgpiod v1 backend. Constructor throws if the chip can't be opened.
 // Each requested GPIO is held in a map until release_line is called.
@@ -34,4 +34,4 @@ class LibgpiodBackend final : public IGpioBackend {
   std::unordered_map<int, std::unique_ptr<gpiod::line>> lines_;
 };
 
-}  // namespace dssurrogate
+}  // namespace surrogate

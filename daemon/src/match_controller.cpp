@@ -2,7 +2,7 @@
 
 #include "periodic_task.hpp"
 
-namespace dssurrogate {
+namespace surrogate {
 
 const char* match_phase_name(MatchPhase p) noexcept {
   switch (p) {
@@ -162,4 +162,4 @@ MatchController::Snapshot MatchController::snapshot(
   return Snapshot{phase_, elapsed, total, remaining};
 }
 
-}  // namespace dssurrogate
+}  // namespace surrogate

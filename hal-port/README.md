@@ -49,39 +49,44 @@ Disk: clone is ~150 MB; build outputs add ~1 GB; downloaded toolchain adds
 ## Build
 
 ```
-cd upstream/allwpilib
 export JAVA_HOME=/usr/lib/jvm/java-25-openjdk-arm64
 export PATH=$JAVA_HOME/bin:$PATH
 
 # One-time: install the SystemCore cross-toolchain bundle
-./gradlew installSystemCoreToolchain -Ponlylinuxsystemcore
+./build.sh installSystemCoreToolchain -Ponlylinuxsystemcore
 
 # Build the HAL JNI shared lib (and its transitive deps: wpiutil, ntcore,
 # wpinet, datalog)
-./gradlew :hal:halJNISharedReleaseSharedLibrary -Ponlylinuxsystemcore
+./build.sh :hal:halJNISharedReleaseSharedLibrary -Ponlylinuxsystemcore
 ```
+
+`build.sh` is a thin wrapper around `upstream/allwpilib/gradlew` that injects
+[`gradle/toolchain-override.gradle`](gradle/toolchain-override.gradle) via
+`--init-script`. All other arguments pass straight through to gradle.
 
 `-Ponlylinuxsystemcore` constrains the build to a single platform target so
 task names lose the platform suffix and the SystemCore toolchain is required
 (non-optional).
 
-## Local fork / patches against upstream
+## Toolchain override (no source patches)
 
-We carry one tiny modification to `shared/config.gradle` to point the opensdk
-toolchain tag at `v2025-2`. The default `v2025-1` is missing the
-aarch64-host SystemCore toolchain bundle (returns 404 on download); `v2025-2`
-has it.
+The upstream allwpilib submodule worktree is unmodified. The one
+build-time override we need — pointing the opensdk toolchain tag at
+`v2025-2` instead of the default `v2025-1` (which is missing the
+aarch64-host SystemCore bundle and 404s on download) — lives in
+[`gradle/toolchain-override.gradle`](gradle/toolchain-override.gradle) and
+is applied via Gradle's `--init-script` mechanism by `build.sh`. The
+override sets `toolchainTag` on the `systemcoreToolchain` and
+`linuxarm64Toolchain` extensions in an `afterEvaluate` hook on every
+project, equivalent to:
 
-```diff
- nativeUtils.addWpiNativeUtils()
- nativeUtils.withCrossLinuxArm64()
- nativeUtils.withCrossSystemCore()
-+
-+project.extensions.findByName('systemcoreToolchain')?.toolchainTag?.set('v2025-2')
-+project.extensions.findByName('linuxarm64Toolchain')?.toolchainTag?.set('v2025-2')
+```groovy
+extensions.findByName('systemcoreToolchain').toolchainTag.set('v2025-2')
+extensions.findByName('linuxarm64Toolchain').toolchainTag.set('v2025-2')
 ```
 
-That's the only patch.
+When upstream opensdk's default tag advances past the missing-bundle
+release, this override can be deleted.
 
 ## Build artifacts (verified)
 
@@ -107,7 +112,7 @@ Symbol-level verification of `libwpiHal.so`:
 
 ## Toolchain notes
 
-`./gradlew installSystemCoreToolchain` downloads
+`./build.sh installSystemCoreToolchain` downloads
 `arm64-bookworm-2025-aarch64-bookworm-linux-gnu-Toolchain-12.2.0.tgz` from
 `wpilibsuite/opensdk` v2025-2 and installs it under
 `~/.gradle/toolchains/first/2025/systemcore`. It's a GCC 12.2 toolchain with a

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace dssurrogate {
+namespace surrogate {
 
 enum class ChannelMode : int {
   Unconfigured = -1,
@@ -53,4 +53,4 @@ class SmartIoChannel {
   bool last_output_ = false;
 };
 
-}  // namespace dssurrogate
+}  // namespace surrogate

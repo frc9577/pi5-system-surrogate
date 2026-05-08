@@ -22,7 +22,7 @@ cd "$(dirname "$0")/.."
 # After the platform/template split, the robot lives in a sibling repo
 # named frc-2027-robot-starter (flattened — gradle project at its root).
 # Override ROBOT_DIR if you keep yours elsewhere.
-DAEMON_BIN=$(readlink -f "ds-surrogate/build/ds-surrogate")
+DAEMON_BIN=$(readlink -f "daemon/build/pi5-system-surrogate")
 ROBOT_DIR=${ROBOT_DIR:-$(readlink -f "../frc-2027-robot-starter" 2>/dev/null || true)}
 [[ -n ${ROBOT_DIR:-} && -d $ROBOT_DIR ]] || {
   echo "missing robot template at $ROBOT_DIR — clone frc-2027-robot-starter as a sibling, or set ROBOT_DIR=" >&2
@@ -30,10 +30,10 @@ ROBOT_DIR=${ROBOT_DIR:-$(readlink -f "../frc-2027-robot-starter" 2>/dev/null || 
 }
 ROBOT_SRC="$ROBOT_DIR/src/main/java/Robot.java"
 
-[[ -x $DAEMON_BIN ]] || { echo "missing $DAEMON_BIN — build ds-surrogate first"; exit 2; }
+[[ -x $DAEMON_BIN ]] || { echo "missing $DAEMON_BIN — build the daemon first"; exit 2; }
 [[ -f $ROBOT_SRC ]] || { echo "missing $ROBOT_SRC"; exit 2; }
 
-LOG_DAEMON=/tmp/ds-match-test.daemon.log
+LOG_DAEMON=/tmp/pi5-system-surrogate-match-test.daemon.log
 LOG_ROBOT=/tmp/robot.log
 DAEMON_PID=""
 

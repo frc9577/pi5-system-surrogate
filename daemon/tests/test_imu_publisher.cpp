@@ -10,11 +10,11 @@
 #include <thread>
 #include <vector>
 
-using dssurrogate::ImuPublisher;
+using surrogate::ImuPublisher;
 using namespace std::chrono_literals;
 
 TEST(ImuPublisher, ConstructionPublishesZeroAccelAndGyro) {
-  dssurrogate::NtServer server{56850};
+  surrogate::NtServer server{56850};
   ImuPublisher imu{server.instance()};
 
   auto accel_sub = server.instance()
@@ -34,7 +34,7 @@ TEST(ImuPublisher, ConstructionPublishesZeroAccelAndGyro) {
 }
 
 TEST(ImuPublisher, QuatIsIdentity) {
-  dssurrogate::NtServer server{56851};
+  surrogate::NtServer server{56851};
   ImuPublisher imu{server.instance()};
 
   auto sub = server.instance()
@@ -51,7 +51,7 @@ TEST(ImuPublisher, QuatIsIdentity) {
 }
 
 TEST(ImuPublisher, YawScalarsAreZero) {
-  dssurrogate::NtServer server{56852};
+  surrogate::NtServer server{56852};
   ImuPublisher imu{server.instance()};
 
   auto sub_flat =

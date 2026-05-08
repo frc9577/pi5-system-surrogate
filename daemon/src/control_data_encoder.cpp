@@ -3,7 +3,7 @@
 #include "mrc/protobuf/MrcComm.npb.h"
 #include "pb_encode.h"
 
-namespace dssurrogate {
+namespace surrogate {
 
 uint32_t pack_control_word(const ControlDataView& v) noexcept {
   uint32_t w = 0;
@@ -39,4 +39,4 @@ std::size_t encode_control_data(const ControlDataView& view,
   return stream.bytes_written;
 }
 
-}  // namespace dssurrogate
+}  // namespace surrogate

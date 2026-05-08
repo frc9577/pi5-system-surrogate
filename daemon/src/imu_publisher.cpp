@@ -9,7 +9,7 @@
 #include <string_view>
 #include <vector>
 
-namespace dssurrogate {
+namespace surrogate {
 
 struct ImuPublisher::Holder {
   std::vector<wpi::nt::DoubleArrayPublisher> array_pubs;
@@ -51,4 +51,4 @@ ImuPublisher::ImuPublisher(wpi::nt::NetworkTableInstance& inst)
 
 ImuPublisher::~ImuPublisher() = default;
 
-}  // namespace dssurrogate
+}  // namespace surrogate

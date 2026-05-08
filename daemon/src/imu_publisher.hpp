@@ -4,7 +4,7 @@
 
 #include <memory>
 
-namespace dssurrogate {
+namespace surrogate {
 
 // Publishes /imu/* topics with zeros. Real SystemCore has an onboard IMU;
 // our Pi doesn't, so we publish defaults so the HAL has something to read.
@@ -25,4 +25,4 @@ class ImuPublisher {
   std::unique_ptr<Holder> holder_;
 };
 
-}  // namespace dssurrogate
+}  // namespace surrogate

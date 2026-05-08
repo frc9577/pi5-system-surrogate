@@ -1,4 +1,4 @@
-// Sample robot tester for ds-surrogate.
+// Sample robot tester for pi5-system-surrogate.
 //
 // Connects to the daemon as a real WPILib NT4 client, validates the two
 // contracts the SystemCore HAL would check at init: ServerReady=true and

@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-NAME=${NAME:-ds-surrogate}
+NAME=${NAME:-pi5-system-surrogate}
 CONFIG=/sys/kernel/config/gpio-sim/$NAME
 
 if [[ ! -d $CONFIG ]]; then

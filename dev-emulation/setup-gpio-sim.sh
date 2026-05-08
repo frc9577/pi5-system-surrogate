@@ -8,7 +8,7 @@
 
 set -euo pipefail
 
-NAME=${NAME:-ds-surrogate}
+NAME=${NAME:-pi5-system-surrogate}
 NUM_LINES=${NUM_LINES:-28}
 CONFIG=/sys/kernel/config/gpio-sim/$NAME
 

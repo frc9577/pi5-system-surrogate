@@ -4,7 +4,7 @@
 
 #include <format>
 
-namespace dssurrogate {
+namespace surrogate {
 
 namespace {
 constexpr int64_t kSentinel = -9999;  // outside any valid HAL type/value
@@ -80,4 +80,4 @@ void SmartIoBridge::run(std::stop_token st) {
   run_periodic(st, kTickPeriod, [this] { tick(); });
 }
 
-}  // namespace dssurrogate
+}  // namespace surrogate

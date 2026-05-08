@@ -1,4 +1,4 @@
-// DaemonTester — minimal NT4 client that validates ds-surrogate's HAL
+// DaemonTester — minimal NT4 client that validates the daemon's HAL
 // contract. Replicates the two checks HAL_Initialize() would do:
 //
 //   1. /Netcomm/Control/ServerReady = true (else HAL terminates after 10s)

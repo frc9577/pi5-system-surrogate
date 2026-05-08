@@ -1,6 +1,6 @@
 # dev-emulation
 
-Validate `ds-surrogate` end-to-end without a real Pi by standing up
+Validate `pi5-system-surrogate` end-to-end without a real Pi by standing up
 **virtual** kernel devices that present the same userspace API as
 hardware:
 
@@ -22,7 +22,7 @@ MCP251xFD/SPI timing, real motors. Those still need a Pi on the bench.
 
 - Linux kernel with `gpio-sim` and `vcan` modules (mainline ≥ 5.18 for
   gpio-sim; vcan has been there forever).
-- `ds-surrogate` built at `../ds-surrogate/build/`.
+- daemon built at `../daemon/build/pi5-system-surrogate`.
 - `curl` and `jq` (`jq` is optional but the test uses `grep` as a
   fallback).
 - `root` for configfs writes and `ip link add`.
@@ -61,7 +61,7 @@ If you want to play with the daemon under emulation interactively:
 ```bash
 sudo ./setup-gpio-sim.sh    # prints the chip path on stdout
 sudo ./setup-vcan.sh
-DS_SURROGATE_GPIOCHIP=/dev/gpiochip5 ../ds-surrogate/build/ds-surrogate &
+PI5_SURROGATE_GPIOCHIP=/dev/gpiochip5 ../daemon/build/pi5-system-surrogate &
 
 # inspect what the daemon drove:
 cat /sys/kernel/debug/gpio-sim/gpio-sim.0/bank0/gpio17/value
@@ -79,12 +79,12 @@ sudo ./teardown-gpio-sim.sh
 
 ## Daemon env-var override
 
-`ds-surrogate`'s libgpiod backend defaults to `/dev/gpiochip0`. The
+The daemon's libgpiod backend defaults to `/dev/gpiochip0`. The
 gpio-sim chip allocates the next available number (often `gpiochip5`+ on
 hosts that already have onboard GPIO). Set:
 
 ```
-DS_SURROGATE_GPIOCHIP=/dev/gpiochip5
+PI5_SURROGATE_GPIOCHIP=/dev/gpiochip5
 ```
 
 …to point at the simulated chip. The integration test does this

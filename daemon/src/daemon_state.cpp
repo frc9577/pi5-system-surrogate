@@ -1,6 +1,6 @@
 #include "daemon_state.hpp"
 
-namespace dssurrogate {
+namespace surrogate {
 
 void DaemonState::set_enabled(bool v) {
   std::lock_guard lk{mu_};
@@ -41,4 +41,4 @@ ControlDataView DaemonState::snapshot_control() const {
   };
 }
 
-}  // namespace dssurrogate
+}  // namespace surrogate

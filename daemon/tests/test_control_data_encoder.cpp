@@ -8,10 +8,10 @@
 #include <array>
 #include <cstddef>
 
-using dssurrogate::ControlDataView;
-using dssurrogate::encode_control_data;
-using dssurrogate::pack_control_word;
-using dssurrogate::RobotMode;
+using surrogate::ControlDataView;
+using surrogate::encode_control_data;
+using surrogate::pack_control_word;
+using surrogate::RobotMode;
 
 namespace {
 
@@ -28,9 +28,9 @@ mrc_proto_ProtobufControlData decode(std::span<const std::byte> bytes) {
 }  // namespace
 
 TEST(ControlWordPacking, EnabledBit) {
-  EXPECT_EQ(pack_control_word({.enabled = true}) & dssurrogate::kCwEnabledBit,
-            dssurrogate::kCwEnabledBit);
-  EXPECT_EQ(pack_control_word({.enabled = false}) & dssurrogate::kCwEnabledBit,
+  EXPECT_EQ(pack_control_word({.enabled = true}) & surrogate::kCwEnabledBit,
+            surrogate::kCwEnabledBit);
+  EXPECT_EQ(pack_control_word({.enabled = false}) & surrogate::kCwEnabledBit,
             0u);
 }
 
@@ -38,16 +38,16 @@ TEST(ControlWordPacking, EnabledAlsoSetsWatchdogActive) {
   // Watchdog tracks `enabled` — it isn't a separate struct field.
   uint32_t cw_on = pack_control_word({.enabled = true});
   uint32_t cw_off = pack_control_word({.enabled = false});
-  EXPECT_TRUE(cw_on & dssurrogate::kCwWatchdogActiveBit);
-  EXPECT_FALSE(cw_off & dssurrogate::kCwWatchdogActiveBit);
+  EXPECT_TRUE(cw_on & surrogate::kCwWatchdogActiveBit);
+  EXPECT_FALSE(cw_off & surrogate::kCwWatchdogActiveBit);
 }
 
 TEST(ControlWordPacking, RobotModeAllValues) {
   for (auto m : {RobotMode::Unknown, RobotMode::Auto, RobotMode::Teleop,
                  RobotMode::Test}) {
     auto cw = pack_control_word({.mode = m});
-    EXPECT_EQ((cw & dssurrogate::kCwRobotModeMask) >>
-                  dssurrogate::kCwRobotModeShift,
+    EXPECT_EQ((cw & surrogate::kCwRobotModeMask) >>
+                  surrogate::kCwRobotModeShift,
               static_cast<uint32_t>(m));
   }
 }
@@ -60,29 +60,29 @@ TEST(ControlWordPacking, IndependentFlagsDoNotInterfere) {
       .alliance = 3,
   };
   uint32_t cw = pack_control_word(v);
-  EXPECT_TRUE(cw & dssurrogate::kCwEnabledBit);
-  EXPECT_TRUE(cw & dssurrogate::kCwDsConnectedBit);
-  EXPECT_TRUE(cw & dssurrogate::kCwWatchdogActiveBit);  // derived from enabled
-  EXPECT_FALSE(cw & dssurrogate::kCwFmsConnectedBit);
-  EXPECT_FALSE(cw & dssurrogate::kCwEStopBit);
-  EXPECT_EQ((cw & dssurrogate::kCwRobotModeMask) >>
-                dssurrogate::kCwRobotModeShift,
+  EXPECT_TRUE(cw & surrogate::kCwEnabledBit);
+  EXPECT_TRUE(cw & surrogate::kCwDsConnectedBit);
+  EXPECT_TRUE(cw & surrogate::kCwWatchdogActiveBit);  // derived from enabled
+  EXPECT_FALSE(cw & surrogate::kCwFmsConnectedBit);
+  EXPECT_FALSE(cw & surrogate::kCwEStopBit);
+  EXPECT_EQ((cw & surrogate::kCwRobotModeMask) >>
+                surrogate::kCwRobotModeShift,
             static_cast<uint32_t>(RobotMode::Teleop));
-  EXPECT_EQ((cw & dssurrogate::kCwAllianceMask) >>
-                dssurrogate::kCwAllianceShift,
+  EXPECT_EQ((cw & surrogate::kCwAllianceMask) >>
+                surrogate::kCwAllianceShift,
             3u);
 }
 
 TEST(ControlWordPacking, AllianceClampedToFourBits) {
   uint32_t cw = pack_control_word({.alliance = 0xFF});
-  EXPECT_EQ((cw & dssurrogate::kCwAllianceMask) >>
-                dssurrogate::kCwAllianceShift,
+  EXPECT_EQ((cw & surrogate::kCwAllianceMask) >>
+                surrogate::kCwAllianceShift,
             0xFu);
-  EXPECT_EQ(cw & ~dssurrogate::kCwAllianceMask, 0u);
+  EXPECT_EQ(cw & ~surrogate::kCwAllianceMask, 0u);
 }
 
 TEST(ControlDataEncoder, ProducesNonEmptyBytes) {
-  std::array<std::byte, dssurrogate::kControlDataMaxBytes> buf{};
+  std::array<std::byte, surrogate::kControlDataMaxBytes> buf{};
   ControlDataView v{.enabled = true, .ds_connected = true};
   std::size_t n = encode_control_data(v, buf);
   EXPECT_GT(n, 0u);
@@ -90,7 +90,7 @@ TEST(ControlDataEncoder, ProducesNonEmptyBytes) {
 }
 
 TEST(ControlDataEncoder, RoundTripsControlWordAndMatchTime) {
-  std::array<std::byte, dssurrogate::kControlDataMaxBytes> buf{};
+  std::array<std::byte, surrogate::kControlDataMaxBytes> buf{};
   ControlDataView v{
       .enabled = true,
       .ds_connected = true,
@@ -103,13 +103,13 @@ TEST(ControlDataEncoder, RoundTripsControlWordAndMatchTime) {
 
   auto decoded = decode(std::span<const std::byte>{buf.data(), n});
   EXPECT_EQ(decoded.MatchTime, 47);
-  EXPECT_TRUE(decoded.ControlWord & dssurrogate::kCwEnabledBit);
-  EXPECT_TRUE(decoded.ControlWord & dssurrogate::kCwDsConnectedBit);
-  EXPECT_EQ((decoded.ControlWord & dssurrogate::kCwRobotModeMask) >>
-                dssurrogate::kCwRobotModeShift,
+  EXPECT_TRUE(decoded.ControlWord & surrogate::kCwEnabledBit);
+  EXPECT_TRUE(decoded.ControlWord & surrogate::kCwDsConnectedBit);
+  EXPECT_EQ((decoded.ControlWord & surrogate::kCwRobotModeMask) >>
+                surrogate::kCwRobotModeShift,
             static_cast<uint32_t>(RobotMode::Auto));
-  EXPECT_EQ((decoded.ControlWord & dssurrogate::kCwAllianceMask) >>
-                dssurrogate::kCwAllianceShift,
+  EXPECT_EQ((decoded.ControlWord & surrogate::kCwAllianceMask) >>
+                surrogate::kCwAllianceShift,
             2u);
 }
 

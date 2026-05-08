@@ -10,7 +10,7 @@
 #include <cstring>
 #include <print>
 
-namespace dssurrogate::linux_runtime {
+namespace surrogate::linux_runtime {
 
 bool lock_all_memory() {
   if (mlockall(MCL_CURRENT | MCL_FUTURE) != 0) {
@@ -52,4 +52,4 @@ void notify_raw(std::string_view payload) {
   ::close(fd);
 }
 
-}  // namespace dssurrogate::linux_runtime
+}  // namespace surrogate::linux_runtime

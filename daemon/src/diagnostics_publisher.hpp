@@ -11,7 +11,7 @@
 #include <string_view>
 #include <thread>
 
-namespace dssurrogate {
+namespace surrogate {
 
 // Publishes /dev/diag/* topics at 1 Hz so external tools (AdvantageScope,
 // ntcli) can verify the daemon is alive without HTTP.
@@ -55,4 +55,4 @@ class DiagnosticsPublisher {
   std::jthread thread_;
 };
 
-}  // namespace dssurrogate
+}  // namespace surrogate

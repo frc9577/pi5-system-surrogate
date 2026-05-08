@@ -10,7 +10,7 @@
 #include <thread>
 #include <vector>
 
-namespace dssurrogate {
+namespace surrogate {
 
 // Bridges /io/{ch}/* NT topics to a SmartIoChannel state machine driving
 // libgpiod. One channel slot per (channel, gpio) entry in `mappings`.
@@ -71,4 +71,4 @@ class SmartIoBridge {
   std::jthread thread_;
 };
 
-}  // namespace dssurrogate
+}  // namespace surrogate

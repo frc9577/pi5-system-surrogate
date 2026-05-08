@@ -2,7 +2,7 @@
 
 #include "wpi/nt/NetworkTableInstance.hpp"
 
-namespace dssurrogate {
+namespace surrogate {
 
 // Owns a wpi::nt::NetworkTableInstance bound as an NT4 server on
 // localhost:6810 — the contract the WPILib SystemCore HAL connects to as
@@ -30,4 +30,4 @@ class NtServer {
   unsigned int port_;
 };
 
-}  // namespace dssurrogate
+}  // namespace surrogate

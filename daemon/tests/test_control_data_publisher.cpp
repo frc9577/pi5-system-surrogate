@@ -13,9 +13,9 @@
 #include <thread>
 #include <vector>
 
-using dssurrogate::ControlDataPublisher;
-using dssurrogate::DaemonState;
-using dssurrogate::RobotMode;
+using surrogate::ControlDataPublisher;
+using surrogate::DaemonState;
+using surrogate::RobotMode;
 using namespace std::chrono_literals;
 
 namespace {
@@ -79,7 +79,7 @@ TEST(ControlDataPublisher, ReflectsLiveStateChanges) {
         reinterpret_cast<const pb_byte_t*>(bytes.data()), bytes.size());
     EXPECT_TRUE(pb_decode(
         &s, mrc_proto_ProtobufControlData::msg_descriptor(), &out));
-    return (out.ControlWord & dssurrogate::kCwEnabledBit) != 0;
+    return (out.ControlWord & surrogate::kCwEnabledBit) != 0;
   };
   EXPECT_FALSE(decode_enabled(sink.received.front()));
   EXPECT_TRUE(decode_enabled(sink.received.back()));

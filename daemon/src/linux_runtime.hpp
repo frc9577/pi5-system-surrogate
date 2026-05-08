@@ -2,7 +2,7 @@
 
 #include <string_view>
 
-namespace dssurrogate {
+namespace surrogate {
 
 // Hand-rolled Linux runtime helpers — avoids a libsystemd-dev dep.
 //
@@ -26,4 +26,4 @@ void notify_raw(std::string_view payload);
 
 }  // namespace linux_runtime
 
-}  // namespace dssurrogate
+}  // namespace surrogate

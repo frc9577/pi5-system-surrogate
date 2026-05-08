@@ -1,8 +1,8 @@
 # sample-robot
 
-Minimal Java NT4 client that validates the HAL contract `ds-surrogate`
-serves. Stands in for what `HAL_Initialize()` checks on the wire, without
-dragging in the full WPILib HAL.
+Minimal Java NT4 client that validates the HAL contract
+`pi5-system-surrogate` serves. Stands in for what `HAL_Initialize()` checks
+on the wire, without dragging in the full WPILib HAL.
 
 ## What it tests
 
@@ -23,7 +23,7 @@ gradle wrapper; standard `gradle` works).
 
 ```bash
 # In another terminal, start the daemon:
-( cd ../ds-surrogate && ./build/ds-surrogate )
+( cd ../daemon && ./build/pi5-system-surrogate )
 
 # In this directory:
 gradle run

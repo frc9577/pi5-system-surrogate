@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-using dssurrogate::CadenceTracker;
+using surrogate::CadenceTracker;
 
 TEST(Cadence, EmptyReportsZero) {
   CadenceTracker t;

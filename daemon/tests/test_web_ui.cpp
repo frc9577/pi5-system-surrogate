@@ -12,14 +12,14 @@
 #include <array>
 #include <string>
 
-using dssurrogate::CadenceTracker;
-using dssurrogate::DaemonState;
-using dssurrogate::IGpioBackend;
-using dssurrogate::MatchController;
-using dssurrogate::MatchPhase;
-using dssurrogate::RobotMode;
-using dssurrogate::SmartIoBridge;
-using dssurrogate::WebUI;
+using surrogate::CadenceTracker;
+using surrogate::DaemonState;
+using surrogate::IGpioBackend;
+using surrogate::MatchController;
+using surrogate::MatchPhase;
+using surrogate::RobotMode;
+using surrogate::SmartIoBridge;
+using surrogate::WebUI;
 using namespace std::chrono_literals;
 
 namespace {
@@ -36,7 +36,7 @@ class StubBackend final : public IGpioBackend {
 constexpr std::array<SmartIoBridge::PinMapping, 2> kMap{{{0, 17}, {1, 27}}};
 
 struct WebUIFixture {
-  dssurrogate::NtServer server{56840};
+  surrogate::NtServer server{56840};
   StubBackend backend;
   DaemonState state;
   CadenceTracker cadence;

@@ -3,7 +3,7 @@
 #include "nt_topics.hpp"
 #include "periodic_task.hpp"
 
-namespace dssurrogate {
+namespace surrogate {
 
 DiagnosticsPublisher::DiagnosticsPublisher(wpi::nt::NetworkTableInstance& inst,
                                            const CadenceTracker& cadence,
@@ -44,4 +44,4 @@ void DiagnosticsPublisher::run(std::stop_token st) {
   run_periodic(st, kTickPeriod, [this] { tick(); });
 }
 
-}  // namespace dssurrogate
+}  // namespace surrogate

@@ -1,0 +1,15 @@
+// Override the opensdk toolchain tag for the SystemCore and linuxarm64
+// cross toolchains. The default v2025-1 release on wpilibsuite/opensdk is
+// missing the aarch64-host SystemCore bundle (returns 404 during
+// installSystemCoreToolchain); v2025-2 has it.
+//
+// Applied via `--init-script` so the upstream allwpilib submodule worktree
+// stays clean. See hal-port/build.sh.
+
+allprojects {
+    afterEvaluate { project ->
+        ['systemcoreToolchain', 'linuxarm64Toolchain'].each { name ->
+            project.extensions.findByName(name)?.toolchainTag?.set('v2025-2')
+        }
+    }
+}

@@ -38,6 +38,10 @@ jobs:
           distribution: temurin
           java-version: 25
 
+      - name: Resolve allwpilib submodule SHA for cache key
+        id: subsha
+        run: echo "sha=$(git rev-parse HEAD:hal-port/upstream/allwpilib)" >> "$GITHUB_OUTPUT"
+
       - name: Cache upstream WPILib gradle build
         uses: actions/cache@v4
         with:
@@ -46,12 +50,11 @@ jobs:
             hal-port/upstream/allwpilib/.gradle
             hal-port/upstream/allwpilib/build
             hal-port/upstream/allwpilib/*/build
-          key: wpilib-${{ runner.os }}-${{ hashFiles('hal-port/upstream/allwpilib/.git/HEAD') }}
+          key: wpilib-${{ runner.os }}-${{ steps.subsha.outputs.sha }}
 
       - name: Build upstream WPILib (jars + JNI .so's)
-        working-directory: hal-port/upstream/allwpilib
         run: |
-          ./gradlew \
+          ./hal-port/build.sh \
             :ntcore:jar :wpiutil:jar \
             :ntcore:ntcoreJNISharedReleaseSharedLibrary \
             :wpiutil:wpiutilJNISharedReleaseSharedLibrary \
@@ -59,22 +62,22 @@ jobs:
             -Ponlylinuxsystemcore
 
       - name: Configure + build daemon
-        working-directory: ds-surrogate
+        working-directory: daemon
         run: |
           cmake -B build -G Ninja -DCMAKE_CXX_COMPILER=g++-16
           ninja -C build
 
       - name: Run unit tests
-        working-directory: ds-surrogate/build
+        working-directory: daemon/build
         run: ctest --output-on-failure
 
       - name: Coverage build + report
-        working-directory: ds-surrogate
+        working-directory: daemon
         run: |
           cmake -B build-cov -G Ninja \
             -DCMAKE_CXX_COMPILER=g++-16 \
-            -DDS_SURROGATE_COVERAGE=ON
-          ninja -C build-cov ds_surrogate_tests
+            -DDAEMON_COVERAGE=ON
+          ninja -C build-cov daemon_tests
           (cd build-cov && ctest)
           python3 -m venv .venv
           .venv/bin/pip install -q gcovr

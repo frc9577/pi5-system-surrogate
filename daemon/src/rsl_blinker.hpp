@@ -6,7 +6,7 @@
 #include <chrono>
 #include <thread>
 
-namespace dssurrogate {
+namespace surrogate {
 
 // Drives the Robot Signal Light line based on DaemonState's enable bit.
 // FRC convention: solid ON when disabled, ~1 Hz blink when enabled. The
@@ -39,4 +39,4 @@ class RslBlinker {
   std::jthread thread_;
 };
 
-}  // namespace dssurrogate
+}  // namespace surrogate

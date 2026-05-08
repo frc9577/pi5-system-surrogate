@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <span>
 
-namespace dssurrogate {
+namespace surrogate {
 
 enum class RobotMode : int {
   Unknown = 0,
@@ -53,4 +53,4 @@ std::size_t encode_control_data(const ControlDataView& view,
 // (no joysticks, short GameData). Real ceiling is ~150 bytes; round up.
 inline constexpr std::size_t kControlDataMaxBytes = 256;
 
-}  // namespace dssurrogate
+}  // namespace surrogate

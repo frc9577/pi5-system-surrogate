@@ -27,13 +27,13 @@ The Pi 5 has the same brain but **none of the FRC-specific peripherals**.
 
 ## Software stack
 
-`systemcore-os` is a whole OS image. Our equivalent is three things stacked: stock 64-bit Pi OS, our [`pi-os/`](../pi-os/) configs, and the [`ds-surrogate/`](../ds-surrogate/) daemon. The comparison below is between what Limelight's OS provides and what those three together deliver.
+`systemcore-os` is a whole OS image. Our equivalent is three things stacked: stock 64-bit Pi OS, our [`pi-os/`](../pi-os/) configs, and the [`daemon/`](../daemon/) (the `pi5-system-surrogate` binary). The comparison below is between what Limelight's OS provides and what those three together deliver.
 
 | Capability | Limelight `systemcore-os` | Our stand-in |
 | --- | --- | --- |
 | Base OS | Custom Limelight Linux distro (built from public sources at [LimelightVision/systemcore-os-public](https://github.com/LimelightVision/systemcore-os-public)) | Vanilla Debian (Pi OS 64-bit) |
 | WPILib HAL | Bundled, target-built for SystemCore | Hand-built from upstream `linuxsystemcore` target — bit-for-bit the same source ([hal-port/](../hal-port/)) |
-| `localhost:6810` NT4 server | Bundled `system-server` daemon | Our `ds-surrogate` daemon (see [daemon-design.md](daemon-design.md)) |
+| `localhost:6810` NT4 server | Bundled `system-server` daemon | Our `pi5-system-surrogate` daemon (see [daemon-design.md](daemon-design.md)) |
 | SmartIo `/io/{ch}/*` topics | Daemon talks to RP2350 over its private bus → real timing-deterministic I/O | Daemon talks to libgpiod on the Pi's 40-pin header → no hardware PWM timing, software best-effort |
 | DS bridge | Speaks the **closed FIRST DS wire protocol** to the real DS app, translates to `mrc::ControlData` | Skips the closed wire entirely; ingests gamepad input from a laptop helper (SDL2/evdev) over NT4 + a tiny web UI for enable/disable |
 | IMU `/imu/*` topics | Real onboard IMU data | Daemon publishes zeros so the HAL has something to read |
@@ -59,7 +59,7 @@ These are the things the team's effort builds equity in. They keep working uncha
 
 These are scaffolding. They should not accumulate features beyond what the team needs to make progress today:
 
-- `ds-surrogate/` daemon — replaced by Limelight's `system-server`
+- `daemon/` (`pi5-system-surrogate` binary) — replaced by Limelight's `system-server`
 - `pi-os/` configs (udev, systemd-networkd) — SystemCore image owns this
 - `hal-port/` custom HAL build — SystemCore ships its own
 - Pi-specific GPIO pin maps — SmartIo channels are physical on real hardware

@@ -12,7 +12,7 @@ Scope is intentionally narrow: CAN devices, RSL, and 4 digital I/O.
 ## Companion docs
 
 - [systemcore-vs-pi5.md](systemcore-vs-pi5.md) — what's different between real SystemCore and our Pi 5 analog, and which parts of our stack survive the 2027 transition vs. get thrown away
-- [daemon-design.md](daemon-design.md) — design of the `ds-surrogate` daemon: language, modules, full NT4 topic contract, GPIO pin map, startup/failure semantics
+- [daemon-design.md](daemon-design.md) — design of the `pi5-system-surrogate` daemon: language, modules, full NT4 topic contract, GPIO pin map, startup/failure semantics
 
 ## Reference: how real SystemCore is built
 
@@ -44,7 +44,7 @@ upstream.
 
 ```
                     closed wire protocol         NT4 protobuf
-[FIRST Driver Station]  ────X────► [DS Surrogate (laptop)]  ──────┐
+[FIRST Driver Station]  ────X────► [Pi5 System Surrogate (Pi)]  ──┐
        (stretch goal only)                                         │
                                                                    ▼
                                                         ┌─────────────────────┐
@@ -87,16 +87,18 @@ upstream.
 ### HAL build (`hal-port/`)
 
 The upstream SystemCore HAL builds **unchanged** for the `linuxsystemcore`
-platform on aarch64 hosts. One config tweak required: bump the opensdk
-toolchain tag from `v2025-1` to `v2025-2` (the v2025-1 release is missing
-the aarch64-host SystemCore toolchain bundle).
+platform on aarch64 hosts. One build-time override required: bump the
+opensdk toolchain tag from `v2025-1` to `v2025-2` (the v2025-1 release is
+missing the aarch64-host SystemCore toolchain bundle). The
+`hal-port/build.sh` wrapper applies this via a Gradle init script so the
+submodule worktree itself stays clean — see
+[hal-port/README.md](../hal-port/README.md).
 
 Build command (after JDK 25 + libgpiod-dev installed):
 
 ```
-cd hal-port/upstream/allwpilib
-./gradlew installSystemCoreToolchain -Ponlylinuxsystemcore
-./gradlew :hal:halJNISharedReleaseSharedLibrary -Ponlylinuxsystemcore
+./hal-port/build.sh installSystemCoreToolchain -Ponlylinuxsystemcore
+./hal-port/build.sh :hal:halJNISharedReleaseSharedLibrary -Ponlylinuxsystemcore
 ```
 
 Produces `libwpiHal.so`, `libwpiHaljni.so`, and the supporting NT/wpiutil/
@@ -107,7 +109,7 @@ both ship `linuxsystemcore` JNI artifacts that link against this HAL.
 
 See [hal-port/README.md](../hal-port/README.md) for full build details.
 
-### System server / DS surrogate (`ds-surrogate/`)
+### System server / DS surrogate (`daemon/`)
 
 Stand-in for Limelight's `system-server` daemon: NT4 server on
 `localhost:6810` that bridges SmartIo topics to libgpiod and synthesizes

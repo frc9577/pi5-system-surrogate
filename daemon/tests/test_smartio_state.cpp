@@ -5,9 +5,9 @@
 #include <random>
 #include <vector>
 
-using dssurrogate::ChannelMode;
-using dssurrogate::IGpioBackend;
-using dssurrogate::SmartIoChannel;
+using surrogate::ChannelMode;
+using surrogate::IGpioBackend;
+using surrogate::SmartIoChannel;
 
 namespace {
 

@@ -26,7 +26,7 @@ constexpr int kPollMs = 20;
 constexpr int kTimeoutMs = 2000;
 
 bool wait_for_server_ready(wpi::nt::NetworkTableInstance& inst) {
-  auto sub = inst.GetBooleanTopic(dssurrogate::topics::kServerReady)
+  auto sub = inst.GetBooleanTopic(surrogate::topics::kServerReady)
                  .Subscribe(false);
   for (int waited = 0; waited <= kTimeoutMs; waited += kPollMs) {
     if (sub.Get()) {
@@ -41,8 +41,8 @@ bool wait_for_server_ready(wpi::nt::NetworkTableInstance& inst) {
 }
 
 bool wait_for_control_data(wpi::nt::NetworkTableInstance& inst) {
-  auto sub = inst.GetRawTopic(dssurrogate::topics::kControlData)
-                 .Subscribe(dssurrogate::topics::kTypeProtoControlData,
+  auto sub = inst.GetRawTopic(surrogate::topics::kControlData)
+                 .Subscribe(surrogate::topics::kTypeProtoControlData,
                             std::vector<uint8_t>{});
   for (int waited = 0; waited <= kTimeoutMs; waited += kPollMs) {
     auto bytes = sub.Get();
@@ -54,7 +54,7 @@ bool wait_for_control_data(wpi::nt::NetworkTableInstance& inst) {
         std::println(stderr, "ControlData decode failed: {}", PB_GET_ERROR(&s));
         return false;
       }
-      if (!(msg.ControlWord & dssurrogate::kCwDsConnectedBit)) {
+      if (!(msg.ControlWord & surrogate::kCwDsConnectedBit)) {
         std::println(stderr,
                      "ControlData has DsConnected=false; HAL would disable");
         return false;

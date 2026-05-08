@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# End-to-end integration test for ds-surrogate, running against virtual
-# kernel devices (gpio-sim + vcan) instead of real hardware.
+# End-to-end integration test for pi5-system-surrogate, running against
+# virtual kernel devices (gpio-sim + vcan) instead of real hardware.
 #
 # Requires:
 #   - root (configfs + ip link)
-#   - ds-surrogate built at ../ds-surrogate/build/
+#   - daemon built at ../daemon/build/
 #   - curl + jq
 #
 # Phases:
@@ -16,11 +16,11 @@
 set -euo pipefail
 
 cd "$(dirname "$0")"
-DAEMON_BIN=$(readlink -f "../ds-surrogate/build/ds-surrogate")
-CHECK_BIN=$(readlink -f "../ds-surrogate/build/check_server_ready")
-NT_TOOL=$(readlink -f "../ds-surrogate/build/nt_smartio_test")
+DAEMON_BIN=$(readlink -f "../daemon/build/pi5-system-surrogate")
+CHECK_BIN=$(readlink -f "../daemon/build/check_server_ready")
+NT_TOOL=$(readlink -f "../daemon/build/nt_smartio_test")
 
-[[ -x $DAEMON_BIN ]] || { echo "missing $DAEMON_BIN — build ds-surrogate first"; exit 2; }
+[[ -x $DAEMON_BIN ]] || { echo "missing $DAEMON_BIN — build the daemon first"; exit 2; }
 [[ -x $CHECK_BIN ]]  || { echo "missing $CHECK_BIN";  exit 2; }
 [[ -x $NT_TOOL ]]    || { echo "missing $NT_TOOL";    exit 2; }
 
@@ -29,7 +29,7 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-LOG=/tmp/ds-surrogate-integration.log
+LOG=/tmp/pi5-system-surrogate-integration.log
 DAEMON_PID=""
 GPIOCHIP=""
 DEV_NAME=""
@@ -48,13 +48,13 @@ trap cleanup EXIT
 echo "=== bring up virtual hardware ==="
 GPIOCHIP=$(./setup-gpio-sim.sh)
 ./setup-vcan.sh
-DEV_NAME=$(< /sys/kernel/config/gpio-sim/ds-surrogate/dev_name)
+DEV_NAME=$(< /sys/kernel/config/gpio-sim/pi5-system-surrogate/dev_name)
 DEBUGFS=/sys/kernel/debug/gpio-sim/$DEV_NAME/bank0
 echo "gpio-sim chip:  $GPIOCHIP"
 echo "gpio-sim debugfs: $DEBUGFS"
 
 echo "=== start daemon ==="
-DS_SURROGATE_GPIOCHIP=$GPIOCHIP "$DAEMON_BIN" > "$LOG" 2>&1 &
+PI5_SURROGATE_GPIOCHIP=$GPIOCHIP "$DAEMON_BIN" > "$LOG" 2>&1 &
 DAEMON_PID=$!
 sleep 1.0
 

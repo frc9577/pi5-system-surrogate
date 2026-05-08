@@ -1,6 +1,6 @@
 #include "smartio_state.hpp"
 
-namespace dssurrogate {
+namespace surrogate {
 
 SmartIoChannel::SmartIoChannel(int channel, int gpio,
                                IGpioBackend& backend) noexcept
@@ -57,4 +57,4 @@ bool SmartIoChannel::sample_input() {
   return backend_.get_value(gpio_);
 }
 
-}  // namespace dssurrogate
+}  // namespace surrogate

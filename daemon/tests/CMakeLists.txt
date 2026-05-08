@@ -1,4 +1,4 @@
-add_executable(ds_surrogate_tests
+add_executable(daemon_tests
   test_smoke.cpp
   test_control_data_encoder.cpp
   test_daemon_state.cpp
@@ -15,11 +15,11 @@ add_executable(ds_surrogate_tests
   test_imu_publisher.cpp
   test_match_controller.cpp
 )
-target_link_libraries(ds_surrogate_tests PRIVATE
-  ds_surrogate_core
+target_link_libraries(daemon_tests PRIVATE
+  daemon_core
   GTest::gtest_main
 )
-ds_surrogate_apply_rpath(ds_surrogate_tests)
+daemon_apply_rpath(daemon_tests)
 
 include(GoogleTest)
-gtest_discover_tests(ds_surrogate_tests)
+gtest_discover_tests(daemon_tests)

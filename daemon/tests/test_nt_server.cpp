@@ -7,7 +7,7 @@
 #include <chrono>
 #include <thread>
 
-using dssurrogate::NtServer;
+using surrogate::NtServer;
 
 namespace {
 

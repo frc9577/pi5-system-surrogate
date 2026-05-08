@@ -5,7 +5,7 @@
 #include <thread>
 #include <utility>
 
-namespace dssurrogate {
+namespace surrogate {
 
 // Runs `tick` on a fixed cadence until `st` requests stop. Used by every
 // periodic publisher in the daemon (controldata, diagnostics, rsl,
@@ -31,4 +31,4 @@ void run_periodic(std::stop_token st,
   }
 }
 
-}  // namespace dssurrogate
+}  // namespace surrogate

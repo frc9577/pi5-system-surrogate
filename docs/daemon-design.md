@@ -1,4 +1,4 @@
-# `ds-surrogate` Daemon: Design
+# `pi5-system-surrogate` Daemon: Design
 
 ## Role
 
@@ -48,7 +48,7 @@ Pi OS Bookworm is in the same boat; either install from a Debian backport that p
 Link targets: `libntcore.so`, `libwpiutil.so`, `libwpinet.so` from the [hal-port/](../hal-port/) build. Headers live under `hal-port/upstream/allwpilib/{ntcore,wpiutil,wpinet}/src/main/native/include/`. CMake resolves them via a project-local find module (`cmake/FindWPILibNative.cmake`).
 
 ```bash
-cd ds-surrogate
+cd daemon
 cmake -B build -G Ninja \
   -DCMAKE_CXX_COMPILER=g++-16 \
   -DWPILIB_NATIVE_ROOT=$PWD/../hal-port/upstream/allwpilib
@@ -57,14 +57,14 @@ ninja -C build
 
 Build targets:
 
-- `ds-surrogate` — daemon binary, installed to `/opt/ds-surrogate/bin/`
-- `ds-surrogate-tests` — unit tests
+- `pi5-system-surrogate` — daemon binary, installed to `/opt/pi5-system-surrogate/bin/`
+- `daemon_tests` — unit tests
 - `proto` — auto-generated `MrcComm.pb.{h,cc}` from `proto/MrcComm.proto`
 
 ## Module layout
 
 ```
-ds-surrogate/
+daemon/
 ├── CMakeLists.txt
 ├── cmake/
 │   └── FindWPILibNative.cmake     # resolves .so's + headers from hal-port/
@@ -85,7 +85,7 @@ ds-surrogate/
 │   ├── web_ui.{cpp,hpp}           # cpp-httplib server: enable/disable, mode, e-stop
 │   └── pin_map.hpp                # constexpr SmartIo channel ↔ Pi GPIO map
 ├── tests/                         # GoogleTest cases
-└── ds-surrogate.service           # systemd unit
+└── pi5-system-surrogate.service   # systemd unit
 helper-laptop/                     # separate package — runs on driver laptop
 └── gamepad_reader.py              # Python is fine here; just an NT4 client
 ```
@@ -233,7 +233,7 @@ systemd `Type=notify`, `std::println(std::cerr, …)` with structured key=value 
 level=warn ts=2026-05-07T22:34:18Z component=ds_bridge cadence_p99_ms=8.2 reason=tick_overrun
 ```
 
-Levels `trace, debug, info, warn, error, fatal`; default `info`; override via `DS_SURROGATE_LOG=debug`. No third-party logging library — `std::print` carries its weight.
+Levels `trace, debug, info, warn, error, fatal`; default `info`; override via `PI5_SURROGATE_LOG=debug`. No third-party logging library — `std::print` carries its weight.
 
 ### `/dev/diag/*` NT topics
 
@@ -292,13 +292,13 @@ The HAL uses **nanopb 0.4.9**, not stock libprotobuf — vendored upstream and c
 set(MRC_GEN ${WPILIB_NATIVE_ROOT}/hal/src/generated/main/native/cpp/mrc/protobuf)
 set(NANOPB ${WPILIB_NATIVE_ROOT}/wpiutil/src/main/native/thirdparty/nanopb)
 
-target_sources(ds-surrogate PRIVATE
+target_sources(pi5-system-surrogate PRIVATE
   ${MRC_GEN}/MrcComm.npb.cpp
   ${NANOPB}/pb_common.cpp
   ${NANOPB}/pb_decode.cpp
   ${NANOPB}/pb_encode.cpp
 )
-target_include_directories(ds-surrogate PRIVATE
+target_include_directories(pi5-system-surrogate PRIVATE
   ${WPILIB_NATIVE_ROOT}/hal/src/generated/main/native/cpp
   ${NANOPB}/include
 )
@@ -345,7 +345,7 @@ CI:
 ## systemd integration
 
 ```ini
-# /etc/systemd/system/ds-surrogate.service
+# /etc/systemd/system/pi5-system-surrogate.service
 [Unit]
 Description=SystemCore stand-in NT4 daemon
 After=network-online.target sys-subsystem-net-devices-can_s0.device
@@ -353,8 +353,8 @@ Wants=network-online.target
 
 [Service]
 Type=notify
-ExecStart=/opt/ds-surrogate/bin/ds-surrogate
-Environment=LD_LIBRARY_PATH=/opt/ds-surrogate/lib
+ExecStart=/opt/pi5-system-surrogate/bin/pi5-system-surrogate
+Environment=LD_LIBRARY_PATH=/opt/pi5-system-surrogate/lib
 Restart=on-failure
 RestartSec=2
 WatchdogSec=2s
@@ -368,11 +368,11 @@ WantedBy=multi-user.target
 
 `Type=notify` lets `sd_notify("READY=1")` mark the unit active only after `ServerReady` is published. `WatchdogSec=2s` paired with per-tick `sd_notify("WATCHDOG=1")` auto-restarts a hung publisher. `LimitMEMLOCK=infinity` is required for `mlockall`.
 
-The robot service unit (separate, in `robot-java/`) should `After=ds-surrogate.service` so the HAL doesn't time-out waiting for `ServerReady` on cold boot.
+The robot service unit (separate, in `robot-java/`) should `After=pi5-system-surrogate.service` so the HAL doesn't time-out waiting for `ServerReady` on cold boot.
 
 ## Testing
 
-GoogleTest, run via `ninja -C build test` or directly as `./build/ds-surrogate-tests`.
+GoogleTest, run via `ninja -C build test` or directly as `./build/daemon_tests`.
 
 - **Unit:** protobuf round-trip for every `mrc::*` message; `ControlData` state-transition table; SmartIo channel state machine using a `IGpioBackend` interface so libgpiod can be swapped for a fake in tests
 - **Integration:** spin up the daemon in-process, attach a `nt::NetworkTableInstance` client, verify (a) `ServerReady=true` appears within 100 ms of bind, (b) `ControlData` cadence ≤ 20 ms, (c) `DsConnected` is always set

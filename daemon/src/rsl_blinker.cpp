@@ -2,7 +2,7 @@
 
 #include "periodic_task.hpp"
 
-namespace dssurrogate {
+namespace surrogate {
 
 RslBlinker::RslBlinker(DaemonState& state, IGpioBackend& backend,
                        int gpio) noexcept
@@ -48,4 +48,4 @@ void RslBlinker::run(std::stop_token st) {
   });
 }
 
-}  // namespace dssurrogate
+}  // namespace surrogate

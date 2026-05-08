@@ -9,8 +9,8 @@ Wants=network-online.target
 # (libsystemd-dev not currently installed on the workstation). Watchdog
 # integration tracked in docs/daemon-design.md "Derisking" section.
 Type=simple
-ExecStart=/opt/ds-surrogate/bin/ds-surrogate
-Environment=LD_LIBRARY_PATH=/opt/ds-surrogate/lib
+ExecStart=/opt/pi5-system-surrogate/bin/pi5-system-surrogate
+Environment=LD_LIBRARY_PATH=/opt/pi5-system-surrogate/lib
 Restart=on-failure
 RestartSec=2
 
@@ -23,7 +23,7 @@ CPUSchedulingPriority=10
 # mlockall(MCL_CURRENT | MCL_FUTURE) at startup needs MEMLOCK headroom.
 LimitMEMLOCK=infinity
 
-# robot.service should `After=ds-surrogate.service` so HAL_Initialize
+# robot.service should `After=pi5-system-surrogate.service` so HAL_Initialize
 # doesn't time out waiting for ServerReady on cold boot.
 
 [Install]

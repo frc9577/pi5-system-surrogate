@@ -7,7 +7,7 @@
 #include <stop_token>
 #include <thread>
 
-namespace dssurrogate {
+namespace surrogate {
 
 enum class MatchPhase {
   Idle,            // no match running
@@ -78,4 +78,4 @@ class MatchController {
   std::jthread thread_;
 };
 
-}  // namespace dssurrogate
+}  // namespace surrogate

@@ -8,13 +8,13 @@
 #include <chrono>
 #include <thread>
 
-using dssurrogate::DaemonState;
-using dssurrogate::GamepadIngest;
-using dssurrogate::RobotMode;
+using surrogate::DaemonState;
+using surrogate::GamepadIngest;
+using surrogate::RobotMode;
 using namespace std::chrono_literals;
 
 TEST(GamepadIngest, EnabledTopicReflectsToDaemonState) {
-  dssurrogate::NtServer server{56820};
+  surrogate::NtServer server{56820};
   DaemonState state;
   GamepadIngest ingest{server.instance(), state};
 
@@ -27,7 +27,7 @@ TEST(GamepadIngest, EnabledTopicReflectsToDaemonState) {
 }
 
 TEST(GamepadIngest, ModeIntMapsToEnum) {
-  dssurrogate::NtServer server{56821};
+  surrogate::NtServer server{56821};
   DaemonState state;
   GamepadIngest ingest{server.instance(), state};
 
@@ -48,7 +48,7 @@ TEST(GamepadIngest, ModeIntMapsToEnum) {
 }
 
 TEST(GamepadIngest, RunLoopAppliesUpdates) {
-  dssurrogate::NtServer server{56823};
+  surrogate::NtServer server{56823};
   DaemonState state;
   GamepadIngest ingest{server.instance(), state};
   ingest.start();
@@ -63,7 +63,7 @@ TEST(GamepadIngest, RunLoopAppliesUpdates) {
 }
 
 TEST(GamepadIngest, AllianceAndEStopApplied) {
-  dssurrogate::NtServer server{56822};
+  surrogate::NtServer server{56822};
   DaemonState state;
   GamepadIngest ingest{server.instance(), state};
 

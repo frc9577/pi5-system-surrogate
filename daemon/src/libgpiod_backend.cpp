@@ -5,10 +5,10 @@
 #include <print>
 #include <stdexcept>
 
-namespace dssurrogate {
+namespace surrogate {
 
 namespace {
-constexpr const char* kConsumer = "ds-surrogate";
+constexpr const char* kConsumer = "pi5-system-surrogate";
 }
 
 LibgpiodBackend::LibgpiodBackend(const std::string& chip_path)
@@ -58,4 +58,4 @@ bool LibgpiodBackend::get_value(int gpio) {
   return it->second->get_value() != 0;
 }
 
-}  // namespace dssurrogate
+}  // namespace surrogate

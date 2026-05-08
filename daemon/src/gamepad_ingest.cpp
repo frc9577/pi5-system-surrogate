@@ -4,7 +4,7 @@
 #include "periodic_task.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
 
-namespace dssurrogate {
+namespace surrogate {
 
 namespace {
 constexpr int64_t kModeUnknownDefault = 0;
@@ -72,4 +72,4 @@ void GamepadIngest::run(std::stop_token st) {
   run_periodic(st, kTickPeriod, [this] { tick(); });
 }
 
-}  // namespace dssurrogate
+}  // namespace surrogate

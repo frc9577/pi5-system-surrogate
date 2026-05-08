@@ -14,7 +14,7 @@ namespace httplib {
 class Server;
 }
 
-namespace dssurrogate {
+namespace surrogate {
 
 // Single-page web UI + /healthz, served by cpp-httplib on a configurable
 // port (default 8080). The page polls /api/state every second and shows
@@ -58,4 +58,4 @@ class WebUI {
   int bound_port_ = -1;
 };
 
-}  // namespace dssurrogate
+}  // namespace surrogate

@@ -2,13 +2,13 @@
 
 #include <print>
 
-namespace dssurrogate {
+namespace surrogate {
 
 NtServer::NtServer() : NtServer(kDefaultPort) {}
 
 NtServer::NtServer(unsigned int port)
     : inst_{wpi::nt::NetworkTableInstance::Create()}, port_{port} {
-  inst_.StartServer(/*persist_filename=*/"ds-surrogate.json",
+  inst_.StartServer(/*persist_filename=*/"pi5-system-surrogate.json",
                     /*listen_address=*/"127.0.0.1",
                     /*mdns_service=*/"",
                     port_);
@@ -20,4 +20,4 @@ NtServer::~NtServer() {
   wpi::nt::NetworkTableInstance::Destroy(inst_);
 }
 
-}  // namespace dssurrogate
+}  // namespace surrogate

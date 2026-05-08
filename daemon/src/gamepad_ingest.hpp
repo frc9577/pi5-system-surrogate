@@ -8,7 +8,7 @@
 #include <chrono>
 #include <thread>
 
-namespace dssurrogate {
+namespace surrogate {
 
 // Subscribes to /dev/control/* topics (written by the helper-laptop
 // gamepad reader and the web UI) and applies them to DaemonState.
@@ -57,4 +57,4 @@ class GamepadIngest {
   std::jthread thread_;
 };
 
-}  // namespace dssurrogate
+}  // namespace surrogate

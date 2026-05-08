@@ -2,7 +2,7 @@
 
 #include "smartio_state.hpp"
 
-namespace dssurrogate {
+namespace surrogate {
 
 // No-op backend: used when libgpiod can't open the chip (e.g., running
 // the daemon on a workstation for development). All operations are
@@ -16,4 +16,4 @@ class NullGpioBackend final : public IGpioBackend {
   bool get_value(int) override { return false; }
 };
 
-}  // namespace dssurrogate
+}  // namespace surrogate

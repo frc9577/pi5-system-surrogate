@@ -11,9 +11,9 @@
 #include <thread>
 #include <vector>
 
-using dssurrogate::DaemonState;
-using dssurrogate::IGpioBackend;
-using dssurrogate::RslBlinker;
+using surrogate::DaemonState;
+using surrogate::IGpioBackend;
+using surrogate::RslBlinker;
 using namespace std::chrono_literals;
 
 namespace {

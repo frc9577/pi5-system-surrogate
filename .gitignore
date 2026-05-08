@@ -37,8 +37,8 @@ Thumbs.db
 *.swo
 
 # Daemon runtime artifacts
-ds-surrogate.json
-/tmp/ds-surrogate-*.log
+pi5-system-surrogate.json
+/tmp/pi5-system-surrogate-*.log
 
 # .claude project memory (intentionally not committed; see CLAUDE.md)
 .claude/

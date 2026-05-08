@@ -6,7 +6,7 @@
 #include <array>
 #include <utility>
 
-namespace dssurrogate {
+namespace surrogate {
 
 ControlDataPublisher::ControlDataPublisher(DaemonState& state,
                                            ByteSink sink) noexcept
@@ -45,4 +45,4 @@ void ControlDataPublisher::run(std::stop_token st,
   });
 }
 
-}  // namespace dssurrogate
+}  // namespace surrogate
